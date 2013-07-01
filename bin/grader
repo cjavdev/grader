@@ -5,4 +5,4 @@ require 'grader'
 my_specs = File.read("../spec/grader_spec.rb")
 my_solution = File.read("../spec/grader_spec.rb")
 
-p Grader.create(:ruby, my_specs, my_solution).grade
+p Grader.create(:ruby, my_specs, my_solution, :html).grade

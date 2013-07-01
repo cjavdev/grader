@@ -1,8 +1,8 @@
 require 'rspec'
-require 'ruby_grader'
 
 class Grader  
-  attr_accessor :specs, :solution, :report, :pass_count, :fail_count, :error_count
+  attr_accessor :error_count, :fail_count, :pass_count
+  attr_accessor :specs, :solution, :report, :format
   
   ROOT_DIR      = "devfiltr"
   SOLUTION_DIR  = "lib"
@@ -10,16 +10,14 @@ class Grader
   SPEC_DIR      = "spec"
   SPEC_NAME     = "solution_spec"
   
-  def self.create(type, specs, solution)
+  def self.create(type, specs, solution, format = :html)
     setup_tree
-    save_spec_file(specs)
-    save_sol_file(solution)
-
+    
     case type
     when :ruby
-      RubyGrader.new(specs, solution)
+      RubyGrader.new(specs, solution, format)
     when :js
-      JsGrader.new(specs, solution)
+      JsGrader.new(specs, solution, format)
     end
   end
   
@@ -28,7 +26,8 @@ class Grader
   end
   
   private
-  def initialize(specs, solution)
+  def initialize(specs, solution, format)
+    @format = format
     @specs = specs
     @solution = solution
     @pass_count = 0
@@ -48,7 +47,7 @@ class Grader
     end
   end
   
-  def self.save_spec_file(specs)
+  def save_spec_file(specs)
     path =[ROOT_DIR, SPEC_DIR, SPEC_NAME].join("/")
     File.open(path + @lang_ext, "w") do |f|
       req = "require_relative '../#{SOLUTION_DIR}/#{ SOLUTION_NAME }'"
@@ -59,11 +58,39 @@ class Grader
     end
   end
   
-  def self.save_sol_file(solution)
+  def save_sol_file(solution)
     path = [ROOT_DIR, SOLUTION_DIR, SOLUTION_NAME].join("/")
     File.open(path + @lang_ext, "w") do |f|
       f.puts solution
     end
   end
 end
+
+require 'stringio'
+
+class RubyGrader < Grader 
+  attr_accessor :lang_ext
+  
+  def initialize(specs, solution, format)
+    @lang_ext = ".rb"
+
+    save_spec_file(specs)
+    save_sol_file(solution)
+    
+    super(specs, solution, format)
+  end
+  
+  def grade
+    config = RSpec.configuration
+    config.output_stream = StringIO.new #File.open('test.html', 'w')
+    config.formatter = @format
+    config.add_formatter(:json)
+    RSpec::Core::Runner::run([[ROOT_DIR, SPEC_DIR].join("/")])
+    p config.formatters.last.failure_count
+    p config.formatters.last.pending_count
+    p config.formatters.last.example_count
+    @report = config.output_stream.string
+  end
+end
+
 
