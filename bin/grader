@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'hola'
-puts Hola.hi(ARGV[0])
+require 'grader'
+
+my_specs = File.read("../spec/grader_spec.rb")
+my_solution = File.read("../spec/grader_spec.rb")
+
+p Grader.create(:ruby, my_specs, my_solution).grade

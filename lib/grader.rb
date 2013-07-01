@@ -1,8 +1,7 @@
 require 'rspec'
-require 'stringio'
+require 'ruby_grader'
 
-class Grader
-  
+class Grader  
   attr_accessor :specs, :solution, :report, :pass_count, :fail_count, :error_count
   
   ROOT_DIR      = "devfiltr"
@@ -11,22 +10,11 @@ class Grader
   SPEC_DIR      = "spec"
   SPEC_NAME     = "solution_spec"
   
-  LANG_EXT = { :ruby => ".rb", :js => ".js" }
-  
   def self.create(type, specs, solution)
     setup_tree
-    File.open([ROOT_DIR, SPEC_DIR, SPEC_NAME].join("/") + LANG_EXT[type], "w") do |f|
-      req = "require_relative '../#{SOLUTION_DIR}/#{ SOLUTION_NAME }'"
-      unless specs.index(req)
-        f.puts req
-      end
-      f.puts specs
-    end
-    
-    File.open([ROOT_DIR, SOLUTION_DIR, SOLUTION_NAME].join("/") + LANG_EXT[type], "w") do |f|
-      f.puts solution
-    end
-    
+    save_spec_file(specs)
+    save_sol_file(solution)
+
     case type
     when :ruby
       RubyGrader.new(specs, solution)
@@ -59,19 +47,23 @@ class Grader
       end
     end
   end
-end
-
-class RubyGrader < Grader 
-  def initialize(specs, solution)
-    super(specs, solution)
+  
+  def self.save_spec_file(specs)
+    path =[ROOT_DIR, SPEC_DIR, SPEC_NAME].join("/")
+    File.open(path + @lang_ext, "w") do |f|
+      req = "require_relative '../#{SOLUTION_DIR}/#{ SOLUTION_NAME }'"
+      unless specs.index(req)
+        f.puts req
+      end
+      f.puts specs
+    end
   end
   
-  def grade
-    config = RSpec.configuration
-    config.output_stream = StringIO.new #File.open('test.html', 'w')
-    config.formatter = :html
-
-    RSpec::Core::Runner::run([[ROOT_DIR, SPEC_DIR].join("/")])
-    @report = config.output_stream.string
+  def self.save_sol_file(solution)
+    path = [ROOT_DIR, SOLUTION_DIR, SOLUTION_NAME].join("/")
+    File.open(path + @lang_ext, "w") do |f|
+      f.puts solution
+    end
   end
 end
+

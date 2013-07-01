@@ -1,8 +1,9 @@
-require 'rake/testtask'
+gem 'rspec'
+require 'rspec/core/rake_task'
 
-Rake::TestTask.new do |t|
-  t.libs << 'test'
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = ["--format documentation", "--color", "--order=default"]
+  t.pattern = ARGV[1] || "spec/*_spec.rb"
 end
 
-desc "Run tests"
-task :default => :test
+task :default => :spec

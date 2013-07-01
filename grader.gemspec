@@ -1,19 +1,19 @@
 Gem::Specification.new do |s|
-  s.name               = "hola"
+  s.name               = "grader"
   s.version            = "0.0.1"
-  s.default_executable = "hola"
+  s.default_executable = "grader"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Nick Quaranto"]
-  s.date = %q{2010-04-03}
-  s.description = %q{A simple hello world gem}
-  s.email = %q{nick@quaran.to}
-  s.files = ["Rakefile", "lib/hola.rb", "lib/hola/translator.rb", "bin/hola"]
-  s.test_files = ["test/test_hola.rb"]
-  s.homepage = %q{http://rubygems.org/gems/hola}
+  s.authors = ["CJ Avilla"]
+  s.date = %q{2013-06-30}
+  s.description = %q{A gem to grade code assessments using BDD packages}
+  s.email = %q{cjavilla@gmail.com}
+  s.files = ["Rakefile", "lib/grader.rb", "bin/grader"]
+  s.test_files = ["spec/grader_spec.rb"]
+  s.homepage = %q{http://rubygems.org/gems/grader}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Hola!}
+  s.summary = %q{Filter out Devs who can't code!}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
