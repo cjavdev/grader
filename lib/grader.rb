@@ -1,7 +1,7 @@
 require 'rspec'
 
 class Grader  
-  attr_accessor :error_count, :fail_count, :pass_count
+  attr_accessor :example_count, :failure_count, :pending_count
   attr_accessor :specs, :solution, :report, :format
   
   ROOT_DIR      = "devfiltr"
@@ -30,9 +30,9 @@ class Grader
     @format = format
     @specs = specs
     @solution = solution
-    @pass_count = 0
-    @fail_count = 0
-    @error_count = 0
+    @example_count = 0
+    @failure_count = 0
+    @pending_count = 0
   end
   
   def self.setup_tree 
@@ -84,12 +84,18 @@ class RubyGrader < Grader
     config = RSpec.configuration
     config.output_stream = StringIO.new #File.open('test.html', 'w')
     config.formatter = @format
-    config.add_formatter(:json)
-    RSpec::Core::Runner::run([[ROOT_DIR, SPEC_DIR].join("/")])
-    p config.formatters.last.failure_count
-    p config.formatters.last.pending_count
-    p config.formatters.last.example_count
+    path = [Grader::ROOT_DIR, Grader::SPEC_DIR].join("/")
+    puts "path: " + path
+    RSpec::Core::Runner::run(['devfiltr'])
+    @example_count = config.formatters.first.example_count
+    puts "example count " +  @example_count.to_s
+    @failure_count = config.formatters.first.failure_count
+    puts "failure count " + @failure_count.to_s
+    @pending_count = config.formatters.first.pending_count  
+    puts "pending count " + @pending_count.to_s           
     @report = config.output_stream.string
+    p config
+    self                
   end
 end
 
